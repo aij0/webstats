@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 from servers import parse_servers
+from website_poller import connect_to_servers
 
 
 def validate_input_file_type(file):
@@ -33,10 +34,12 @@ def main(argv):
             sys.exit(0)
 
     try:
-        parse_servers(inputfile)
+        servers = parse_servers(inputfile)
     except KeyError as err:
         logging.error("Please use 'servers' as array name %s", err)
         sys.exit(1)
+
+    connect_to_servers(servers)
 
     
 if __name__ == "__main__":

@@ -29,3 +29,4 @@ def parse_servers(file):
         else:
             logging.warning("Issue with server detail, please check")
     file.close()
+    return data
