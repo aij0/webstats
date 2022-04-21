@@ -1,8 +1,9 @@
 #!/usr/bin/python
 import getopt
-import json
+import logging
 import os
 import sys
+from servers import parse_servers
 
 
 def validate_input_file_type(file):
@@ -10,19 +11,10 @@ def validate_input_file_type(file):
     if file_extension == ".json":
         return file
     else:
-        print("input file not .json, please check file given")
+        logging.error("input file not .json, please check file given")
         sys.exit(1)
 
-def parse_servers(file):
-    file = open(file)
-    data = json.load(file)
-    for i in data['servers']:
-        print(i)
-
-    file.close()
-
 def main(argv):
-    servers = ""
     help = "-h [help], -i <inputfile> [web servers]"
 
     try:
@@ -43,11 +35,10 @@ def main(argv):
     try:
         parse_servers(inputfile)
     except KeyError as err:
-        print("Please use 'servers' as array name")
-        print(err)
+        logging.error("Please use 'servers' as array name %s", err)
         sys.exit(1)
-    
 
+    
 if __name__ == "__main__":
     main(sys.argv[1:])
 
