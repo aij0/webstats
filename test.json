@@ -1,0 +1,25 @@
+{
+   "servers": [
+       {"server": "first",
+        "address": "127.0.0.1",
+        "poll_period": "60",
+        "regex": "hello"
+    },
+    {"server": "second",
+        "address": "127.0.0.2",
+        "poll_period": "30",
+        "regex": "find"
+    },
+    {"server": "third",
+        "address": "127.0.0.3",
+        "poll_period": "25",
+        "regex": "this"
+    }
+    ,
+    {"server": "fourth",
+        "address": "127.0.0.4",
+        "poll_period": "120",
+        "regex": "string"
+    }
+    ]
+}
