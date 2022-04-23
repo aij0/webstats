@@ -1,7 +1,7 @@
 import json
-import jsonschema
 import logging
 import sys
+from common.validators import validate_schema_details
 
 serverSchema = {
         "type": "object",
@@ -14,22 +14,13 @@ serverSchema = {
     }
 
 
-def validate_server_details(dict):
-    try:
-        jsonschema.validate(instance=dict, schema=serverSchema)
-    except jsonschema.exceptions.ValidationError as err:
-        logging.error("The server details are not correct %s", err)
-        return False
-    return True
-
-
 def parse_servers(file):
     data = ""
     try:
         file = open(file)
         data = json.load(file)
-        for i in data['servers']:
-            if validate_server_details(i):
+        for server in data['servers']:
+            if validate_schema_details(server, serverSchema):
                 logging.debug("Server details ok")
             else:
                 logging.warning("Issue with server detail, please check")
