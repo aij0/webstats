@@ -15,8 +15,10 @@ def validate_input_file_type(file):
         logging.error("input file not .json, please check file given")
         sys.exit(1)
 
+
 def main(argv):
     help = "-h [help], -i <inputfile> [web servers]"
+    inputfile = ""
 
     try:
         opts, args = getopt.getopt(argv, "hi:",["ifile="])
@@ -30,8 +32,12 @@ def main(argv):
         elif opt in ("-i", "--ifile"):
             inputfile = validate_input_file_type(arg)
         else:
-            print("No arguments give, exiting")
+            print("unknown argument, exiting")
             sys.exit(0)
+
+    if not opts:
+        print(help)
+        sys.exit()
 
     try:
         servers = parse_servers(inputfile)
@@ -41,7 +47,6 @@ def main(argv):
 
     connect_to_servers(servers)
 
-    
+
 if __name__ == "__main__":
     main(sys.argv[1:])
-
