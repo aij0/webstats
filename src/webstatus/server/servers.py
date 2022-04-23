@@ -1,6 +1,7 @@
 import json
 import jsonschema
 import logging
+import sys
 
 serverSchema = {
         "type": "object",
@@ -23,12 +24,18 @@ def validate_server_details(dict):
 
 
 def parse_servers(file):
-    file = open(file)
-    data = json.load(file)
-    for i in data['servers']:
-        if validate_server_details(i):
-            logging.debug("Server details ok")
-        else:
-            logging.warning("Issue with server detail, please check")
-    file.close()
+    data = ""
+    try:
+        file = open(file)
+        data = json.load(file)
+        for i in data['servers']:
+            if validate_server_details(i):
+                logging.debug("Server details ok")
+            else:
+                logging.warning("Issue with server detail, please check")
+        file.close()
+    except FileNotFoundError:
+        logging.error("File not found")
+        sys.exit(2)
+
     return data
