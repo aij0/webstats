@@ -21,7 +21,7 @@ def main(argv):
     inputfile = ""
 
     try:
-        opts, args = getopt.getopt(argv, "hi:",["ifile="])
+        opts, args = getopt.getopt(argv, "hi:", ["ifile="])
     except getopt.GetoptError:
         print(help)
         sys.exit(2)

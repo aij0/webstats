@@ -12,6 +12,7 @@ serverSchema = {
         }
     }
 
+
 def validate_server_details(dict):
     try:
         jsonschema.validate(instance=dict, schema=serverSchema)
@@ -19,6 +20,7 @@ def validate_server_details(dict):
         logging.error("The server details are not correct %s", err)
         return False
     return True
+
 
 def parse_servers(file):
     file = open(file)
