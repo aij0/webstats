@@ -3,8 +3,8 @@ import getopt
 import logging
 import os
 import sys
-from servers import parse_servers
-from website_poller import connect_to_servers
+from server.servers import parse_servers
+from server.poller import connect_to_servers
 
 
 def validate_input_file_type(file):
