@@ -1,7 +1,7 @@
 import urllib
 import logging
 import re
-import threading
+from threading import Timer
 
 
 def get_page(address):
@@ -24,25 +24,27 @@ def check_regex(page, regex):
 
 def connect_to_server(server):
     uri_prefix = "http://"
+    name = server["server"]
+    address = server["address"]
+    regex = server["regex"]
 
     try:
-        page, code = get_page(uri_prefix + server["address"])
-        logging.debug("Return code: %s", code)
-        if server["regex"]:
-            content_found = check_regex(page, server["regex"])
+        page, retcode = get_page(uri_prefix + address)
+        logging.debug("Server [%s] return code: %s", name, retcode)
+        if regex:
+            content_found = check_regex(page, regex)
             logging.debug(content_found)
     except Exception as err:
         logging.error("Error: %s", err)
 
 
-def poller(data):
-    threads = list()
-    for server in data['servers']:
-        logging.debug("starting thread for %s.", server)
-        x = threading.Thread(target=connect_to_server, args=(server,))
-        threads.append(x)
-        x.start()
+class Repeater(Timer):
+    def run(self):
+        while not self.finished.wait(self.interval):
+            self.function(*self.args, **self.kwargs)
 
-    for index, thread in enumerate(threads):
-        thread.join()
-        logging.debug("thread %d done", index)
+
+def poller(data):
+    for server in data['servers']:
+        timer = Repeater(server["poll_period"], connect_to_server, [server])
+        timer.start()

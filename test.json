@@ -2,23 +2,23 @@
    "servers": [
        {"server": "first",
         "address": "127.0.0.1:5000",
-        "poll_period": 60,
+        "poll_period": 5,
         "regex": "Weight"
     },
     {"server": "second",
         "address": "127.0.0.1:5000",
-        "poll_period": 30,
+        "poll_period": 10,
         "regex": "[0-9]"
     },
     {"server": "third",
         "address": "127.0.0.1:5000",
-        "poll_period": 25,
+        "poll_period": 15,
         "regex": ""
     }
     ,
     {"server": "fourth",
         "address": "127.0.0.1:5000",
-        "poll_period": 120,
+        "poll_period": 20,
         "regex": "string"
     }
     ]
