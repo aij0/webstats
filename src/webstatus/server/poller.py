@@ -4,10 +4,11 @@ import re
 
 
 def get_page(address):
-    page_raw = urllib.request.urlopen(address)
-    html_bytes = page_raw.read()
+    response = urllib.request.urlopen(address)
+    return_code = response.getcode()
+    html_bytes = response.read()
     html = html_bytes.decode('utf-8')
-    return html
+    return html, return_code
 
 
 def check_regex(page, regex):
@@ -24,7 +25,8 @@ def connect_to_servers(data):
     uri_prefix = "http://"
     for server in data['servers']:
         try:
-            page = get_page(uri_prefix + server["address"])
+            page, code = get_page(uri_prefix + server["address"])
+            logging.debug("Return code: %s", code)
             if server["regex"]:
                 content_found = check_regex(page, server["regex"])
                 logging.debug(content_found)
