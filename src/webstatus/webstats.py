@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 from server.servers import parse_servers
-from server.poller import connect_to_servers
+from server.poller import poller
 
 
 def validate_input_file_type(file):
@@ -45,7 +45,7 @@ def main(argv):
         logging.error("Please use 'servers' as array name %s", err)
         sys.exit(1)
 
-    connect_to_servers(servers)
+    poller(servers)
 
 
 if __name__ == "__main__":
