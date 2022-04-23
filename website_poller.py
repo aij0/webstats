@@ -1,14 +1,14 @@
-from queue import Empty
 import urllib
-from urllib.request import urlopen
 import logging
 import re
+
 
 def get_page(address):
     page_raw = urllib.request.urlopen(address)
     html_bytes = page_raw.read()
     html = html_bytes.decode('utf-8')
     return html
+
 
 def check_regex(page, regex):
     pattern = re.compile(regex)
@@ -25,8 +25,8 @@ def connect_to_servers(data):
     for server in data['servers']:
         try:
             page = get_page(uri_prefix + server["address"])
-            content_found = check_regex(page, server["regex"])
-            logging.debug(content_found)
+            if server["regex"]:
+                content_found = check_regex(page, server["regex"])
+                logging.debug(content_found)
         except Exception as err:
             logging.error("Error: %s", err)
-        
