@@ -1,8 +1,11 @@
 import urllib
 import logging
 import re
+import sys
 from threading import Timer
-from database.local import create_server_insert_query, query
+from database.local import create_server_insert_query
+from database.local import create_status_insert_query, execute_query
+from database.local import setup_database
 
 
 def get_page(address):
@@ -28,6 +31,8 @@ def connect_to_server(server):
     name = server["server"]
     address = server["address"]
     regex = server["regex"]
+    content_found = None
+    retcode = None
 
     try:
         page, retcode = get_page(uri_prefix + address)
@@ -38,6 +43,22 @@ def connect_to_server(server):
     except Exception as err:
         logging.error("Error: %s", err)
 
+    return retcode, content_found
+
+
+def poll_server(server, database, server_id):
+    return_code, content_found = connect_to_server(server)
+
+    try:
+        execute_query(database,
+                      "push",
+                      create_status_insert_query(return_code,
+                                                 content_found,
+                                                 server_id))
+    except Exception as err:
+        print("Can't execute query to the database: ", err)
+        sys.exit(3)
+
 
 class Repeater(Timer):
     def run(self):
@@ -45,10 +66,23 @@ class Repeater(Timer):
             self.function(*self.args, **self.kwargs)
 
 
-def poller(data, db_connection):
+def poller(data, database):
     for server in data['servers']:
         name = server["server"]
         address = server["address"]
-        query(db_connection, create_server_insert_query(name, address))
-        timer = Repeater(server["poll_period"], connect_to_server, [server])
+        server_id_query = f"SELECT id FROM servers WHERE name = '{name}'"
+
+        setup_database(server)
+
+        execute_query(database,
+                      "push",
+                      create_server_insert_query(name, address))
+
+        server_id = execute_query(database,
+                                  "pull",
+                                  server_id_query)
+        server_id = server_id[0]
+        logging.debug("Server %s id %s", name, server_id)
+        timer = Repeater(server["poll_period"],
+                         poll_server, [server, database, server_id])
         timer.start()
