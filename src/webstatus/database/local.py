@@ -1,5 +1,6 @@
 import logging
 from sqlite3 import Error, connect
+import sys
 
 create_servers_table = """
 CREATE TABLE IF NOT EXISTS servers (
@@ -42,3 +43,25 @@ def query(connection, query):
         logging.error("Query error: %s", err)
         return False
     return True
+
+
+def setup_database(config):
+    try:
+        db_connection = create_connection("local.sqlite")
+    except Exception as err:
+        logging.error("Can't create local database: %s", err)
+        sys.exit(3)
+
+    try:
+        query(db_connection, create_servers_table)
+        logging.debug("Query %s succeeded", create_servers_table)
+    except Exception as err:
+        logging.error("Query failed with %s", err)
+
+    try:
+        query(db_connection, create_stats_table)
+        logging.debug("Query %s succeeded", create_stats_table)
+    except Exception as err:
+        logging.error("Query failed with %s", err)
+
+    return db_connection

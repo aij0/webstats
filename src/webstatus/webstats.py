@@ -2,9 +2,10 @@
 import getopt
 import logging
 import sys
+from common.validators import validate_input_file_type
+from database.local import setup_database
 from server.servers import parse_servers
 from server.poller import poller
-from common.validators import validate_input_file_type
 
 
 def parse_args(argv):
@@ -42,6 +43,12 @@ def main(argv):
     except KeyError as err:
         logging.error("Please use 'servers' as array name %s", err)
         sys.exit(1)
+
+    try:
+        db_connection = setup_database("local.sqlite")
+    except Exception as err:
+        print("Can't create local database: ", err)
+        sys.exit(3)
 
     poller(servers)
 
