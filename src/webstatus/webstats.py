@@ -50,7 +50,7 @@ def main(argv):
         print("Can't create local database: ", err)
         sys.exit(3)
 
-    poller(servers)
+    poller(servers, db_connection)
 
 
 if __name__ == "__main__":

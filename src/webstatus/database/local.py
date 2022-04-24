@@ -4,15 +4,16 @@ import sys
 
 create_servers_table = """
 CREATE TABLE IF NOT EXISTS servers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    address TEXT NOT NULL
+    address TEXT NOT NULL,
+    UNIQUE(name)
 );
 """
 
 create_stats_table = """
 CREATE TABLE IF NOT EXISTS stats (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
     return_code INTEGER,
     content_found INTEGER(1),
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -20,6 +21,13 @@ CREATE TABLE IF NOT EXISTS stats (
     FOREIGN KEY (server_id) REFERENCES servers (id)
 )
 """
+
+
+def create_server_insert_query(server, address):
+    fullquery = f"""INSERT OR IGNORE INTO servers (name, address)
+     VALUES ('{server}', '{address}');"""
+    logging.debug("server insert query: %s", fullquery)
+    return fullquery
 
 
 def create_connection(path):

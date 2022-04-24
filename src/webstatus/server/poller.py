@@ -2,6 +2,7 @@ import urllib
 import logging
 import re
 from threading import Timer
+from database.local import create_server_insert_query, query
 
 
 def get_page(address):
@@ -44,7 +45,10 @@ class Repeater(Timer):
             self.function(*self.args, **self.kwargs)
 
 
-def poller(data):
+def poller(data, db_connection):
     for server in data['servers']:
+        name = server["server"]
+        address = server["address"]
+        query(db_connection, create_server_insert_query(name, address))
         timer = Repeater(server["poll_period"], connect_to_server, [server])
         timer.start()
