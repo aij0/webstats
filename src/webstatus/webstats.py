@@ -1,22 +1,13 @@
 #!/usr/bin/python
 import getopt
 import logging
-import os
 import sys
 from server.servers import parse_servers
 from server.poller import poller
+from common.validators import validate_input_file_type
 
 
-def validate_input_file_type(file):
-    filename, file_extension = os.path.splitext(file)
-    if file_extension == ".json":
-        return file
-    else:
-        logging.error("input file not .json, please check file given")
-        sys.exit(1)
-
-
-def main(argv):
+def parse_args(argv):
     help = "-h [help], -i <inputfile> [web servers]"
     inputfile = ""
 
@@ -33,11 +24,18 @@ def main(argv):
             inputfile = validate_input_file_type(arg)
         else:
             print("unknown argument, exiting")
-            sys.exit(0)
+            sys.exit(1)
 
     if not opts:
         print(help)
         sys.exit()
+
+    return inputfile
+
+
+def main(argv):
+
+    inputfile = parse_args(argv)
 
     try:
         servers = parse_servers(inputfile)
