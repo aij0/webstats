@@ -1,10 +1,12 @@
 import unittest
-import src.webstatus.server.servers as servers
+
+from common.validators import validate_schema_details
+from server.servers import serverSchema
 
 
-class TestCodeStyle(unittest.TestCase):
+class TestJSONValidation(unittest.TestCase):
     '''
-    Test server list json validation
+    Test JSON validation with server list
     '''
 
     def test_valid_json(self):
@@ -22,14 +24,14 @@ class TestCodeStyle(unittest.TestCase):
                  }
             ]
         }
-        returnvalue = servers.validate_server_details(valid_json)
+        returnvalue = validate_schema_details(valid_json, serverSchema)
 
         self.assertEqual(returnvalue, True)
 
     def test_empty_json(self):
         empty_json = {
         }
-        servers.validate_server_details(empty_json)
+        validate_schema_details(empty_json, serverSchema)
 
         self.assertRaises(Exception)
 
@@ -48,7 +50,7 @@ class TestCodeStyle(unittest.TestCase):
                  }
             ]
         }
-        servers.validate_server_details(invalid_json)
+        validate_schema_details(invalid_json, serverSchema)
 
         self.assertRaises(Exception)
 
