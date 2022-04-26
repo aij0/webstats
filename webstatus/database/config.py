@@ -10,8 +10,9 @@ databaseSchema = {
             "address": {"type": "string", "format": "ip-address"},
             "port": {"type": "number"},
             "user": {"type": "string"},
-            "password": {"type": "number"}
-        }
+            "password": {"type": "string"}
+        },
+        "required": ["server", "address", "port", "user", "password"]
     }
 
 
