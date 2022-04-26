@@ -10,7 +10,8 @@ serverSchema = {
             "address": {"type": "string", "format": "ip-address"},
             "poll_period": {"type": "number"},
             "regex": {"type": "string"}
-        }
+        },
+        "required": ["server", "address", "poll_period", "regex"]
     }
 
 
