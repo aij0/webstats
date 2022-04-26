@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# hook for running tests before push as we lack the CI for gatekeeping
+
+echo "Running all tests"
+
+cd webstatus
+python3 -m unittest
+TESTRESULT=$(echo $?)
+cd ..
+
+if [ "$TESTRESULT" = "1" ]; 
+then
+    echo "Some unittests fail"
+    exit 1
+else
+    echo "All tests pass"
+    exit 0
+fi
