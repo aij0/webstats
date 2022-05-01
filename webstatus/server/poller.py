@@ -6,6 +6,7 @@ from threading import Timer
 from database.local import create_server_insert_query
 from database.local import create_status_insert_query, execute_query
 from database.local import setup_database
+from kafkaer.producer import create_producer_and_send
 
 
 def get_page(address):
@@ -46,8 +47,12 @@ def connect_to_server(server):
     return retcode, content_found
 
 
-def poll_server(server, database, server_id):
+def poll_server(server, database, server_id, kafkaer):
     return_code, content_found = connect_to_server(server)
+
+    if kafkaer:
+        create_producer_and_send(server, return_code, content_found)
+
 
     try:
         execute_query(database,
@@ -67,7 +72,7 @@ class Repeater(Timer):
             self.function(*self.args, **self.kwargs)
 
 
-def poller(data, database):
+def poller(data, database, kafkaer):
     for server in data['servers']:
         name = server["server"]
         address = server["address"]
@@ -85,5 +90,5 @@ def poller(data, database):
         server_id = server_id[0]
         logging.debug("Server %s id %s", name, server_id)
         timer = Repeater(server["poll_period"],
-                         poll_server, [server, database, server_id])
+                         poll_server, [server, database, server_id, kafkaer])
         timer.start()

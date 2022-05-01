@@ -44,6 +44,7 @@ def main(argv):
         "host": "127.0.0.1",
         "port": "5432"
     }
+    kafkaer = False;
 
     try:
         servers = parse_servers(inputfile)
@@ -51,7 +52,7 @@ def main(argv):
         logging.error("Please use 'servers' as array name %s", err)
         sys.exit(1)
 
-    poller(servers, database)
+    poller(servers, database, kafkaer)
 
 
 if __name__ == "__main__":
