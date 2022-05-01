@@ -56,7 +56,8 @@ def poll_server(server, database, server_id):
                                                  content_found,
                                                  server_id))
     except Exception as err:
-        print("Can't execute query to the database: ", err)
+        logging.error("Can't execute query to the database [%s]: ",
+                      database, err)
         sys.exit(3)
 
 
