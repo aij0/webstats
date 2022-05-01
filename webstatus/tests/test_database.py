@@ -1,6 +1,8 @@
 import unittest
+import database.local
 from common.validators import validate_schema_details
 from database.config import databaseSchema
+from sqlite3 import Connection
 
 
 class TestDataBaseConfigurationValidation(unittest.TestCase):
@@ -36,6 +38,26 @@ class TestDataBaseConfigurationValidation(unittest.TestCase):
         validate_schema_details(invalid_json, databaseSchema)
 
         self.assertRaises(Exception)
+
+
+class TestDataBaseCreation(unittest.TestCase):
+    '''
+    Test database creation
+    '''
+
+    tempdatabase = {
+        "type": "local",
+        "name": ":memory:",
+        "user": "postgres",
+        "password": "password",
+        "host": "127.0.0.1",
+        "port": "5432"
+    }
+
+    def test_database_creation(self):
+        temp_db = database.local.setup_database(self.tempdatabase)
+        self.assertEqual(type(temp_db), Connection)
+        temp_db.close()
 
 
 if __name__ == '__main__':
