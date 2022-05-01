@@ -31,7 +31,7 @@ def connect_to_server(server):
     name = server["server"]
     address = server["address"]
     regex = server["regex"]
-    content_found = None
+    content_found = 'NULL'
     retcode = None
 
     try:
@@ -57,7 +57,7 @@ def poll_server(server, database, server_id):
                                                  server_id))
     except Exception as err:
         logging.error("Can't execute query to the database [%s]: ",
-                      database, err)
+                      database["name"], err)
         sys.exit(3)
 
 
@@ -73,11 +73,11 @@ def poller(data, database):
         address = server["address"]
         server_id_query = f"SELECT id FROM servers WHERE name = '{name}'"
 
-        setup_database(server)
+        setup_database(database)
 
-        execute_query(database,
-                      "push",
-                      create_server_insert_query(name, address))
+        execute_query(database, "push",
+                      create_server_insert_query(database["type"],
+                                                 name, address))
 
         server_id = execute_query(database,
                                   "pull",

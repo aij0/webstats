@@ -36,7 +36,14 @@ def parse_args(argv):
 def main(argv):
 
     inputfile = parse_args(argv)
-    database = "local.sqlite"
+    database = {
+        "type": "local",
+        "name": "webstat",
+        "user": "postgres",
+        "password": "password",
+        "host": "127.0.0.1",
+        "port": "5432"
+    }
 
     try:
         servers = parse_servers(inputfile)
