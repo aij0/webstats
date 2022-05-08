@@ -11,7 +11,7 @@ class TestDataBaseConfigurationValidation(unittest.TestCase):
     '''
 
     def test_valid_json(self):
-        valid_json = {"server": "local",
+        valid_json = {"name": "local",
                       "address": "127.0.0.1",
                       "port": 1234,
                       "user": "admin",
@@ -30,9 +30,9 @@ class TestDataBaseConfigurationValidation(unittest.TestCase):
         self.assertRaises(Exception)
 
     def test_invalid_json(self):
-        invalid_json = {"server": "local",
+        invalid_json = {"name": "local",
                         "address": "127.0.0.1",
-                        "port": "3306",
+                        "port": 3306,
                         "wrongkey": "wrong"
                         }
         validate_schema_details(invalid_json, databaseSchema)

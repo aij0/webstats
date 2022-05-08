@@ -5,14 +5,19 @@ import sys
 from common.validators import validate_input_file_type
 from server.servers import parse_servers
 from server.poller import poller
+from database.config import parse_config
 
 
 def parse_args(argv):
-    help = "-h [help], -i <inputfile> [web servers]"
-    inputfile = ""
+    help = '''\nArgument(s):
+-h [help],
+-s <JSON inputfile> [web servers],
+-d <JSON inputfile> [database]'''
+    server_inputfile = ""
+    database_inputfile = ""
 
     try:
-        opts, args = getopt.getopt(argv, "hi:", ["ifile="])
+        opts, args = getopt.getopt(argv, "hs:d:", ["sfile=", "dfile="])
     except getopt.GetoptError:
         print(help)
         sys.exit(2)
@@ -20,8 +25,10 @@ def parse_args(argv):
         if opt == "-h":
             print(help)
             sys.exit()
-        elif opt in ("-i", "--ifile"):
-            inputfile = validate_input_file_type(arg)
+        elif opt in ("-s", "--sfile"):
+            server_inputfile = validate_input_file_type(arg)
+        elif opt in ("-d", "--dfile"):
+            database_inputfile = validate_input_file_type(arg)
         else:
             print("unknown argument, exiting")
             sys.exit(1)
@@ -30,25 +37,31 @@ def parse_args(argv):
         print(help)
         sys.exit()
 
-    return inputfile
+    if not server_inputfile:
+        print("Server config missing!")
+        print(help)
+        sys.exit(1)
+    if not database_inputfile:
+        print("Database config missing!")
+        print(help)
+        sys.exit(1)
+
+    return server_inputfile, database_inputfile
 
 
 def main(argv):
 
-    inputfile = parse_args(argv)
-    database = {
-        "type": "local",
-        "name": "webstat",
-        "user": "postgres",
-        "password": "password",
-        "host": "127.0.0.1",
-        "port": "5432"
-    }
+    server_inputfile, database_inputfile = parse_args(argv)
 
     try:
-        servers = parse_servers(inputfile)
+        servers = parse_servers(server_inputfile)
     except KeyError as err:
         logging.error("Please use 'servers' as array name %s", err)
+        sys.exit(1)
+    try:
+        database = parse_config(database_inputfile)
+    except Exception as err:
+        logging.error("Error while parsing database config %s", err)
         sys.exit(1)
 
     poller(servers, database)

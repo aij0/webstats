@@ -6,13 +6,13 @@ from common.validators import validate_schema_details
 databaseSchema = {
         "type": "object",
         "properties": {
-            "server": {"type": "string"},
+            "name": {"type": "string"},
             "address": {"type": "string", "format": "ip-address"},
             "port": {"type": "number"},
             "user": {"type": "string"},
             "password": {"type": "string"}
         },
-        "required": ["server", "address", "port", "user", "password"]
+        "required": ["name", "address", "port", "user", "password"]
     }
 
 
@@ -23,12 +23,14 @@ def parse_config(file):
         data = json.load(file)
         if validate_schema_details(data, databaseSchema):
             logging.debug("database-server details ok")
+            file.close()
         else:
-            logging.warning("Issue with database-server detail, \
+            logging.error("Issue with database-server detail, \
                             ´please check")
-        file.close()
+            file.close()
+            sys.exit(2)
     except FileNotFoundError:
-        logging.error("File not found")
+        logging.error("File [%s] not found", file)
         sys.exit(2)
 
     return data

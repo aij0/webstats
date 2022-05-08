@@ -27,7 +27,7 @@ def parse_servers(file):
                 logging.warning("Issue with server detail, please check")
         file.close()
     except FileNotFoundError:
-        logging.error("File not found")
+        logging.error("File [%s] not found", file)
         sys.exit(2)
 
     return data

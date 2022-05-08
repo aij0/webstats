@@ -1,0 +1,8 @@
+{
+    "type": "local",
+    "name": "webstat",
+    "user": "postgres",
+    "password": "password",
+    "address": "127.0.0.1",
+    "port": 5432
+}
