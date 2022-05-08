@@ -70,10 +70,10 @@ def create_connection(database):
         try:
             connection = psycopg2.connect(user=database["user"],
                                           password=database["password"],
-                                          host=database["host"],
+                                          address=database["address"],
                                           port=database["port"],
                                           database=database["name"])
-            logging.debug("Connection to %s[%s] ok", database["host"],
+            logging.debug("Connection to %s[%s] ok", database["address"],
                           database["name"])
         except Error as err:
             logging.error("Database error: ", err)

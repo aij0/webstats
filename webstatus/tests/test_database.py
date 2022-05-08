@@ -50,7 +50,7 @@ class TestDataBaseCreation(unittest.TestCase):
         "name": ":memory:",
         "user": "postgres",
         "password": "password",
-        "host": "127.0.0.1",
+        "address": "127.0.0.1",
         "port": "5432"
     }
 
