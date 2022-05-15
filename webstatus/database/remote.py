@@ -1,52 +1,58 @@
 import logging
 import sys
-from sqlite3 import Error, connect
+from psycopg2 import connect, Error
 from database.common import storing_query, fetching_query
 
-
-create_sqlite_servers_table = """
+create_postgres_servers_table = """
 CREATE TABLE IF NOT EXISTS servers (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     address TEXT NOT NULL,
     UNIQUE(name)
 );
 """
 
-create_sqlite_stats_table = """
+create_postgres_stats_table = """
 CREATE TABLE IF NOT EXISTS stats (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID SERIAL PRIMARY KEY,
     return_code INTEGER,
-    content_found INTEGER(1),
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    content_found BOOLEAN,
+    timestamp TIMESTAMP,
     server_id INTEGER NOT NULL,
     FOREIGN KEY (server_id) REFERENCES servers (id)
 )
 """
 
 
-def setup_database_in_sqlite(db_connection, database):
+def setup_database_in_postgres(db_connection, database):
     try:
-        storing_query(db_connection, create_sqlite_servers_table)
-        logging.debug("Query %s succeeded", create_sqlite_servers_table)
+        storing_query(db_connection, create_postgres_servers_table)
+        logging.debug("Query %s succeeded", create_postgres_servers_table)
     except Exception as err:
         logging.error("Query failed with %s", err)
 
     try:
         db_connection = create_connection(database)
-        storing_query(db_connection, create_sqlite_stats_table)
-        logging.debug("Query %s succeeded", create_sqlite_stats_table)
+        storing_query(db_connection, create_postgres_stats_table)
+        logging.debug("Query %s succeeded", create_postgres_stats_table)
     except Exception as err:
         logging.error("Query failed with %s", err)
 
 
 def create_connection(database):
     connection = None
+
     try:
-        connection = connect(database["name"])
-        logging.debug("Connection to %s ok", database["name"])
+        connection = connect(user=database["user"],
+                             password=database["password"],
+                             address=database["address"],
+                             port=database["port"],
+                             database=database["name"])
+        logging.debug("Connection to %s[%s] ok", database["address"],
+                      database["name"])
     except Error as err:
         logging.error("Database error: ", err)
+
     return connection
 
 
@@ -66,6 +72,6 @@ def setup_database(database):
         logging.error("Can't create database: %s", err)
         sys.exit(3)
 
-    setup_database_in_sqlite(db_connection, database)
+    setup_database_in_postgres(db_connection, database)
 
     return db_connection
