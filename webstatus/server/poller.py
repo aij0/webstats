@@ -3,12 +3,11 @@ import logging
 import re
 import sys
 from threading import Timer
+
 from database.common import create_server_insert_query
 from database.common import create_status_insert_query
-from database.local import setup_database as setup_sqlite_database
-from database.local import execute_query as execute_sqlite_query
-from database.remote import setup_database as setup_remote_database
-from database.remote import execute_query as execute_postgres_query
+from database.local import SqliteDatabase
+from database.remote import PostgresDatabase
 
 
 def get_page(address):
@@ -49,22 +48,15 @@ def connect_to_server(server):
     return retcode, content_found
 
 
-def poll_server(server, database, server_id):
+def poll_server(databaseInUse, server, database, server_id):
     return_code, content_found = connect_to_server(server)
 
     try:
-        if database["type"] == "postgres":
-            execute_postgres_query(database,
-                                   "push",
-                                   create_status_insert_query(return_code,
-                                                              content_found,
-                                                              server_id))
-        else:
-            execute_sqlite_query(database,
-                                 "push",
-                                 create_status_insert_query(return_code,
-                                                            content_found,
-                                                            server_id))
+        databaseInUse.execute_query(database,
+                                    "push",
+                                    create_status_insert_query(return_code,
+                                                               content_found,
+                                                               server_id))
     except Exception as err:
         logging.error("Can't execute query to the database [%s]: ",
                       database["name"], err)
@@ -81,27 +73,26 @@ def poller(data, database):
     for server in data['servers']:
         name = server["server"]
         address = server["address"]
+        type = database["type"]
         server_id_query = f"SELECT id FROM servers WHERE name = '{name}'"
 
-        if database["type"] == "postgres":
-            setup_remote_database(database)
-            execute_postgres_query(database, "push",
-                                   create_server_insert_query(database["type"],
-                                                              name, address))
-            server_id = execute_postgres_query(database,
-                                               "pull",
-                                               server_id_query)
+        if type == "postgres":
+            databaseInUse = PostgresDatabase()
         else:
-            setup_sqlite_database(database)
-            execute_sqlite_query(database, "push",
-                                 create_server_insert_query(database["type"],
-                                                            name, address))
-            server_id = execute_sqlite_query(database,
-                                             "pull",
-                                             server_id_query)
+            databaseInUse = SqliteDatabase()
+
+        databaseInUse.setup_database(database)
+        databaseInUse.execute_query(database,
+                                    "push",
+                                    create_server_insert_query(type,
+                                                               name, address))
+        server_id = databaseInUse.execute_query(database,
+                                                "pull",
+                                                server_id_query)
 
         server_id = server_id[0]
         logging.debug("Server %s id %s", name, server_id)
         timer = Repeater(server["poll_period"],
-                         poll_server, [server, database, server_id])
+                         poll_server,
+                         [databaseInUse, server, database, server_id])
         timer.start()

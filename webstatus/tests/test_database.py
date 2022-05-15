@@ -55,7 +55,8 @@ class TestDataBaseCreation(unittest.TestCase):
     }
 
     def test_database_creation(self):
-        temp_db = database.local.setup_database(self.tempdatabase)
+        local_db = database.local.SqliteDatabase()
+        temp_db = local_db.setup_database(self.tempdatabase)
         self.assertEqual(type(temp_db), Connection)
         temp_db.close()
 
