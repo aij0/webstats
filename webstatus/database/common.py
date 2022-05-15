@@ -43,6 +43,6 @@ def storing_query(connection, query):
 
 def fetching_query(connection, query):
     cursor, connection = query_cursor(connection, query)
-    response = cursor.fetchone()
+    response = cursor.fetchall()
     connection.close()
     return response
